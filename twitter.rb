@@ -25,6 +25,8 @@ def get_tweet_ids
 end
 
 def post_to_discord(ids)
+  return if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
+
 	ids.each do |id|
 		data = {
 			"content": "https://twitter.com/PlayOverwatch/status/#{id}"

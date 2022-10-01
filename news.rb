@@ -34,6 +34,8 @@ def get_page(page)
 end
 
 def post_to_discord(items)
+  return if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
+
 	data = {
 		"embeds" => items.map do |item|
 			{
