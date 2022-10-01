@@ -7,6 +7,8 @@ require "json"
 require "time"
 require "date"
 
+CACHE_FILE_PATH = "news.json"
+
 def get_page(page)
 	response = Excon.get("https://playoverwatch.com/en-us/news/next-posts/?page=#{page}")
 	json = JSON.parse(response.body)
@@ -55,8 +57,8 @@ def post_to_discord(items)
 end
 
 latest = []
-if File.exists?("latest.json")
-	latest = JSON.parse(File.read("latest.json"))
+if File.exists?(CACHE_FILE_PATH)
+	latest = JSON.parse(File.read(CACHE_FILE_PATH))
 end
 
 items = get_page(1)
@@ -67,4 +69,4 @@ if new_items.size > 0
 	post_to_discord(new_items)
 end
 
-File.write("latest.json", JSON.pretty_generate(items))
+File.write(CACHE_FILE_PATH, JSON.pretty_generate(items))
