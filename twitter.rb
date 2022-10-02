@@ -25,12 +25,16 @@ def get_tweet_ids
 end
 
 def post_to_discord(ids)
-	return if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
-
-	ids.each do |id|
+	ids.reverse_each do |id|
 		data = {
 			"content": "https://twitter.com/PlayOverwatch/status/#{id}"
 		}
+
+		if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
+			puts "WOULD POST TO DISCORD:"
+			puts JSON.pretty_generate(data)
+			next
+		end
 
 		response = Excon.post(
 			ENV["DISCORD_HOOK_URL"],

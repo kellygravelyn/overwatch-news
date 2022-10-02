@@ -34,10 +34,8 @@ def get_page(page)
 end
 
 def post_to_discord(items)
-	return if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
-
 	data = {
-		"embeds" => items.map do |item|
+		"embeds" => items.reverse.map do |item|
 			{
 				"title" => item["title"],
 				"color" => 15823666,
@@ -49,6 +47,12 @@ def post_to_discord(items)
 		end
 	}
 
+	if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
+		puts "WOULD POST TO DISCORD:"
+		puts JSON.pretty_generate(data)
+		return
+	end
+
 	response = Excon.post(
 		ENV["DISCORD_HOOK_URL"],
 		body: data.to_json,
@@ -56,6 +60,10 @@ def post_to_discord(items)
 			"Content-Type" => "application/json"
 		}
 	)
+
+	if response.status != 204
+		puts "Failed to post to Discord: (#{response.status}) #{response.body}"
+	end
 end
 
 latest = []
