@@ -12,4 +12,4 @@ Blizzard doesn't publish an RSS or Atom feed for their news so if I want real-ti
 2. Run `bundle install`.
 3. Run `cp .env.sample .env` to copy the sample.
 4. Edit `.env` to have your correct values.
-5. Setup some cron jobs or something to run the desired scripts every once in a while. I run them every 5 minutes.
+5. Setup some cron jobs or something to run `main.sh` or the individual scripts if you only want some of the stuff.
