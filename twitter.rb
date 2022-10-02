@@ -27,7 +27,7 @@ end
 def post_to_discord(ids)
 	ids.reverse_each do |id|
 		data = {
-			"content": "https://twitter.com/PlayOverwatch/status/#{id}"
+			"content" => "https://twitter.com/PlayOverwatch/status/#{id}"
 		}
 
 		if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""

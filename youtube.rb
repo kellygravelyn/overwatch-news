@@ -33,7 +33,7 @@ end
 def post_to_discord(ids)
 	ids.reverse_each do |id|
 		data = {
-			"content": "https://youtube.com/watch?v=#{id}"
+			"content" => "https://youtube.com/watch?v=#{id}"
 		}
 
 		if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
