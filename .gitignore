@@ -1,6 +1,7 @@
 .DS_Store
 Thumbs.db
 .env
+announcements.json
 latest.json
 news.json
 twitter.json
