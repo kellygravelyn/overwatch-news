@@ -9,28 +9,32 @@ require "date"
 
 CACHE_FILE_PATH = "news.json"
 
-def get_page(page)
-	response = Excon.get("https://playoverwatch.com/en-us/news/next-posts/?page=#{page}")
-	json = JSON.parse(response.body)
-	html_content = Nokogiri::HTML(json["content"])
+def get_description(url)
+	response = Excon.get(url)
+	html_content = Nokogiri::HTML(response.body)
+	html_content.css("meta#description").attribute("content").value.strip
+end
 
-	items = html_content.css("li.NewsItem").map do |item|
-		title = item.css(".NewsItem-title").inner_text
-		url = "https://playoverwatch.com" + item.css(".NewsItem-title").attribute("href").value
-		description = item.css(".NewsItem-summary").inner_text
-		image = item.css(".Card-thumbnail").attribute("style").value
-		timestamp = item.css(".NewsItem-subtitle").inner_text
+def get_latest_articles
+	response = Excon.get("https://overwatch.blizzard.com/en-us/news/")
+	html_content = Nokogiri::HTML(response.body)
+
+	cards = html_content.css("blz-card").map do |card|
+		title = card.css("[slot=\"heading\"]").inner_text
+		url = card.attribute("href").value + "/"
+		image = "https:" + card.css("[slot=\"image\"]").attribute("src").value
+		timestamp = Time.parse(card.attribute("date")).iso8601
 
 		{
+			"id" => url.split("/")[-1],
 			"title" => title,
-			"description" => description,
 			"url" => url,
-			"image" => "https:" + image[22...-1],
-			"timestamp" => Time.parse(timestamp).iso8601
+			"image" => image,
+			"timestamp" => timestamp
 		}
 	end
 
-	items
+	cards
 end
 
 def post_to_discord(items)
@@ -66,17 +70,26 @@ def post_to_discord(items)
 	end
 end
 
-latest = []
+latest_ids = []
 if File.exists?(CACHE_FILE_PATH)
-	latest = JSON.parse(File.read(CACHE_FILE_PATH))
+	latest_ids = JSON.parse(File.read(CACHE_FILE_PATH))
 end
 
-items = get_page(1)
+articles = get_latest_articles
+article_ids = articles.map { |a| a["id"] }
 
-new_items = items - latest
+new_article_ids = article_ids - latest_ids
 
-if new_items.size > 0
-	post_to_discord(new_items)
+if new_article_ids.size > 0
+	new_articles = articles.filter { |a| new_article_ids.include?(a["id"]) }
+
+	# Since getting a description is an extra HTTP call we only
+	# do it for new articles.
+	new_articles.each do |a|
+		a["description"] = get_description(a["url"])
+	end
+
+	post_to_discord(new_articles)
 end
 
-File.write(CACHE_FILE_PATH, JSON.pretty_generate(items))
+File.write(CACHE_FILE_PATH, JSON.pretty_generate(article_ids))
