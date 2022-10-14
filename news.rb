@@ -6,8 +6,8 @@ require "nokogiri"
 require "json"
 require "time"
 require "date"
-
-CACHE_FILE_PATH = "news.json"
+require_relative "cache"
+require_relative "discord"
 
 def get_description(url)
 	response = Excon.get(url)
@@ -51,29 +51,12 @@ def post_to_discord(items)
 		end
 	}
 
-	if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
-		puts "WOULD POST TO DISCORD:"
-		puts JSON.pretty_generate(data)
-		return
-	end
-
-	response = Excon.post(
-		ENV["DISCORD_HOOK_URL"],
-		body: data.to_json,
-		headers: {
-			"Content-Type" => "application/json"
-		}
-	)
-
-	if response.status != 204
-		puts "Failed to post to Discord: (#{response.status}) #{response.body}"
-	end
+	Discord.post(data)
 end
 
-posted_ids = []
-if File.exists?(CACHE_FILE_PATH)
-	posted_ids = JSON.parse(File.read(CACHE_FILE_PATH))
-end
+cache = Cache.new("news")
+
+posted_ids = cache.read_ids
 
 articles = get_latest_articles
 article_ids = articles.map { |a| a["id"] }
@@ -94,4 +77,4 @@ end
 
 posted_ids += new_article_ids
 
-File.write(CACHE_FILE_PATH, JSON.pretty_generate(posted_ids))
+cache.write_ids(posted_ids)
