@@ -70,15 +70,15 @@ def post_to_discord(items)
 	end
 end
 
-latest_ids = []
+posted_ids = []
 if File.exists?(CACHE_FILE_PATH)
-	latest_ids = JSON.parse(File.read(CACHE_FILE_PATH))
+	posted_ids = JSON.parse(File.read(CACHE_FILE_PATH))
 end
 
 articles = get_latest_articles
 article_ids = articles.map { |a| a["id"] }
 
-new_article_ids = article_ids - latest_ids
+new_article_ids = article_ids - posted_ids
 
 if new_article_ids.size > 0
 	new_articles = articles.filter { |a| new_article_ids.include?(a["id"]) }
@@ -92,4 +92,6 @@ if new_article_ids.size > 0
 	post_to_discord(new_articles)
 end
 
-File.write(CACHE_FILE_PATH, JSON.pretty_generate(article_ids))
+posted_ids += new_article_ids
+
+File.write(CACHE_FILE_PATH, JSON.pretty_generate(posted_ids))
