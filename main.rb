@@ -2,6 +2,7 @@ require "rubygems"
 require "bundler/setup"
 require "dotenv/load"
 require "optparse"
+require "fileutils"
 require_relative "lib/log"
 require_relative "lib/discord"
 require_relative "lib/announcements"
@@ -20,13 +21,14 @@ sources = [
 ]
 
 OptionParser.new do |parser|
-  parser.banner = "Usage: main.rb [options]"
-  sources.each do |source|
-  	parser.on("--no-#{source.name.downcase}", "Skip #{source.name}") do |v|
-  		sources.delete(source)
-  	end
-  end
+	parser.banner = "Usage: main.rb [options]"
+	sources.each do |source|
+		parser.on("--no-#{source.name.downcase}", "Skip #{source.name}") do |v|
+			sources.delete(source)
+		end
+	end
 end.parse!
 
-log.info("Getting Overwatch News!")
+log.info("🗞  Getting Overwatch News!")
 sources.each(&:execute)
+log.info("🎉 Done!")

@@ -3,6 +3,10 @@ require "json"
 require_relative "source"
 
 class Announcements < Source
+	def icon
+		"📢"
+	end
+
 	def fetch_items
 		response = Excon.get("https://us.forums.blizzard.com/en/overwatch/c/announcements/5/l/latest.json?ascending=false")
 		json = JSON.parse(response.body)

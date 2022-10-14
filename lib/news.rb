@@ -5,6 +5,10 @@ require "time"
 require_relative "source"
 
 class News < Source
+	def icon
+		"📰"
+	end
+
 	def fetch_items
 		response = Excon.get("https://overwatch.blizzard.com/en-us/news/")
 		html_content = Nokogiri::HTML(response.body)

@@ -5,6 +5,10 @@ require "time"
 require_relative "source"
 
 class Twitter < Source
+	def icon
+		"🐦"
+	end
+
 	def fetch_items
 		response = Excon.get(
 			"https://api.twitter.com/2/users/2420931980/tweets?exclude=replies,retweets",
