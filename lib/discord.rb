@@ -7,7 +7,10 @@ require "json"
 class Discord
 	def initialize(log)
 		@log = log
-		@disabled = ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
+	end
+
+	def disable!
+		@disabled = true
 	end
 
 	def post(data)

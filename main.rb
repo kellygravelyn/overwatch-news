@@ -26,6 +26,9 @@ OptionParser.new do |parser|
 		parser.on("--no-#{source.name.downcase}", "Skip #{source.name}") do |v|
 			sources.delete(source)
 		end
+		parser.on("--no-discord", "Disables sending messages to Discord") do |v|
+			discord.disable!
+		end
 	end
 end.parse!
 
