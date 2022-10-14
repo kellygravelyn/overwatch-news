@@ -2,6 +2,7 @@ require "rubygems"
 require "bundler/setup"
 require "dotenv/load"
 require "excon"
+require "json"
 
 module Discord
 	def self.post(data)
