@@ -5,8 +5,8 @@ require "excon"
 require "json"
 require "time"
 require "date"
-
-CACHE_FILE_PATH = "twitter.json"
+require_relative "cache"
+require_relative "discord"
 
 def get_tweets
 	response = Excon.get(
@@ -47,46 +47,20 @@ def get_tweets
 	end
 end
 
-def post_message_to_discord(content)
-	data = {
-		"content" => content
-	}
-
-	if ENV["NO_DISCORD"] != nil && ENV["NO_DISCORD"] != ""
-		puts "WOULD POST TO DISCORD:"
-		puts JSON.pretty_generate(data)
-		return
-	end
-
-	response = Excon.post(
-		ENV["DISCORD_HOOK_URL"],
-		body: data.to_json,
-		headers: {
-			"Content-Type" => "application/json"
-		}
-	)
-
-	if response.status != 204
-		puts "Failed to post to Discord: (#{response.status}) #{response.body}"
-	end
-
-	sleep(1)
-end
-
 def post_to_discord(tweets)
 	tweets.reverse_each do |t|
-		post_message_to_discord(t["url"])
+		Discord.post({ "content" => t["url"] })
+		sleep(1)
 
 		t["referenced_tweets"].each do |r|
-			post_message_to_discord("↪ #{r["url"]}")
+			Discord.post({ "content" => "↪ #{r["url"]}" })
 		end
 	end
 end
 
-cached_ids = []
-if File.exists?(CACHE_FILE_PATH)
-	cached_ids = JSON.parse(File.read(CACHE_FILE_PATH))
-end
+cache = Cache.new("twitter")
+
+cached_ids = cache.read
 
 tweets = get_tweets
 tweet_ids = tweets.map {|t| t["id"]}
@@ -98,4 +72,4 @@ if new_ids.size > 0
 	post_to_discord(tweets_to_post)
 end
 
-File.write(CACHE_FILE_PATH, JSON.pretty_generate(tweet_ids))
+cache.write(tweet_ids)
