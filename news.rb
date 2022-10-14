@@ -56,7 +56,7 @@ end
 
 cache = Cache.new("news")
 
-posted_ids = cache.read_ids
+posted_ids = cache.read
 
 articles = get_latest_articles
 article_ids = articles.map { |a| a["id"] }
@@ -77,4 +77,4 @@ end
 
 posted_ids += new_article_ids
 
-cache.write_ids(posted_ids)
+cache.write(posted_ids)

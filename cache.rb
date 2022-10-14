@@ -5,7 +5,7 @@ class Cache
 		@name = name
 	end
 
-	def read_ids
+	def read
 		path = cache_file_path
 
 		if File.exists?(path)
@@ -15,9 +15,9 @@ class Cache
 		end
 	end
 
-	def write_ids(ids)
+	def write(values)
 		FileUtils.mkdir_p(cache_directory)
-		File.write(cache_file_path, ids.join("\n"))
+		File.write(cache_file_path, values.join("\n"))
 	end
 
 	def cache_directory
