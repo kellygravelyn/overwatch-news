@@ -2,28 +2,21 @@ require "rubygems"
 require "bundler/setup"
 require "dotenv/load"
 require "optparse"
-require_relative "lib/multi_logger"
+require_relative "lib/log"
 require_relative "lib/discord"
 require_relative "lib/announcements"
 require_relative "lib/news"
 require_relative "lib/twitter"
 require_relative "lib/youtube"
 
-stderr_log = Logger.new(STDERR)
-stderr_log.level = Logger::INFO
-
-file_log = Logger.new("log.txt", 1, (1024 ** 2) * 50)
-file_log.level = Logger::DEBUG
-
-logger = MultiLogger.new(stderr_log, file_log)
-
-discord = Discord.new(logger)
+log = Log.new
+discord = Discord.new(log)
 
 sources = [
-	Announcements.new(logger, discord),
-	News.new(logger, discord),
-	Twitter.new(logger, discord),
-	YouTube.new(logger, discord),
+	Announcements.new(log, discord),
+	News.new(log, discord),
+	Twitter.new(log, discord),
+	YouTube.new(log, discord),
 ]
 
 OptionParser.new do |parser|
@@ -35,5 +28,5 @@ OptionParser.new do |parser|
   end
 end.parse!
 
-logger.info("Getting Overwatch News!")
+log.info("Getting Overwatch News!")
 sources.each(&:execute)

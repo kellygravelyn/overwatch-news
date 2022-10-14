@@ -2,8 +2,8 @@ require_relative "cache"
 require_relative "discord"
 
 class Source
-	def initialize(logger, discord)
-		@logger = logger
+	def initialize(log, discord)
+		@log = log
 		@discord = discord
 		@cache = Cache.new(name.downcase)
 	end
@@ -25,7 +25,7 @@ class Source
 	end
 
 	def execute
-		@logger.info("Fetching #{name} items…")
+		@log.info("Fetching #{name} items…")
 		items = fetch_items
 		item_ids = items.map { |i| item_identifier(i) }
 
@@ -34,8 +34,8 @@ class Source
 		if new_ids.size > 0
 			new_items = items.filter { |i| new_ids.include?(item_identifier(i)) }
 			new_items.reverse_each do |item|
-				@logger.info("Sending #{name} item #{item_identifier(item)} to Discord…")
-				if @discord.post(logger, format_discord_message(item))
+				@log.info("Sending #{name} item #{item_identifier(item)} to Discord…")
+				if @discord.post(log, format_discord_message(item))
 					@cache.write(item_identifier(item))
 				end
 			end
