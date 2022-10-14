@@ -1,8 +1,4 @@
 .DS_Store
 Thumbs.db
 .env
-announcements.json
-latest.json
-twitter.json
-youtube.json
 cache/
