@@ -29,6 +29,10 @@ OptionParser.new do |parser|
 	end
 end.parse!
 
-log.info("🗞  Getting Overwatch News!")
-sources.each(&:execute)
-log.info("🎉 Done!")
+begin
+	log.info("🗞  Getting Overwatch News!")
+	sources.each(&:execute)
+	log.info("🎉 Done!")
+rescue => e
+	log.error("💥 Unhandled error: #{e}")
+end
