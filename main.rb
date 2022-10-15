@@ -1,8 +1,11 @@
+# typed: strict
+
 require "rubygems"
 require "bundler/setup"
 require "dotenv/load"
 require "optparse"
 require "fileutils"
+require "sorbet-runtime"
 require_relative "lib/log"
 require_relative "lib/discord"
 require_relative "lib/announcements"

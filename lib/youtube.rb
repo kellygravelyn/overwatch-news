@@ -1,3 +1,5 @@
+# typed: strict
+
 require "excon"
 require "nokogiri"
 require "json"
@@ -5,10 +7,14 @@ require "time"
 require_relative "source"
 
 class YouTube < Source
+	extend T::Sig
+
+	sig {override.returns(String)}
 	def icon
 		"🎥"
 	end
 
+	sig {override.returns(T::Array[T::Hash[String, T.untyped]])}
 	def fetch_items
 		response = Excon.get(
 			"https://www.youtube.com/feeds/videos.xml?channel_id=UClOf1XXinvZsy4wKPAkro2A",

@@ -1,3 +1,5 @@
+# typed: strict
+
 require "rubygems"
 require "bundler/setup"
 require "dotenv/load"
@@ -5,14 +7,20 @@ require "excon"
 require "json"
 
 class Discord
+	extend T::Sig
+
+	sig {params(log: Log).void}
 	def initialize(log)
 		@log = log
+		@disabled = T.let(false, T::Boolean)
 	end
 
+	sig {void}
 	def disable!
 		@disabled = true
 	end
 
+	sig {params(data: T.untyped).returns(T::Boolean)}
 	def post(data)
 		json = data.to_json
 
@@ -34,7 +42,7 @@ class Discord
 
 			if response.headers["x-ratelimit-remaining"] == "0"
 				sleep_time = response.headers["x-ratelimit-reset-after"]
-				@log.warning("😴 Discord requests exhausted. Pre-emptively sleeping #{sleep_time} second(s) to avoid 429 errors")
+				@log.warn("😴 Discord requests exhausted. Pre-emptively sleeping #{sleep_time} second(s) to avoid 429 errors")
 				sleep(sleep_time.to_f)
 			end
 

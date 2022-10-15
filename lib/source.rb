@@ -1,31 +1,42 @@
+# typed: strict
+
 require_relative "cache"
 require_relative "discord"
 
 class Source
+	extend T::Sig
+	extend T::Helpers
+	abstract!
+
+	sig {params(log: Log, discord: Discord).void}
 	def initialize(log, discord)
 		@log = log
 		@discord = discord
-		@cache = Cache.new(name.downcase)
+		@cache = T.let(Cache.new(name.downcase), Cache)
 	end
 
-	def fetch_items
-		raise "method should be implemented by derived class"
-	end
+	sig {abstract.returns(String)}
+	def icon;	end
 
+	sig {abstract.returns(T::Array[T::Hash[String, T.untyped]])}
+	def fetch_items; end
+
+	sig {params(item: T::Hash[String, T.untyped]).returns(T::Hash[String, T.untyped])}
 	def format_discord_message(item)
 		{ "content" => item["url"] }
 	end
 
+	sig {params(item: T::Hash[String, T.untyped]).returns(String)}
 	def item_identifier(item)
-		item["id"]
+		item["id"].to_s
 	end
 
+	sig {returns(String)}
 	def name
-		self.class.name
+		T.must(self.class.name)
 	end
 
-	def icon;	end
-
+	sig {void}
 	def execute
 		@log.info("#{icon} Fetching #{name} items…")
 		items = fetch_items

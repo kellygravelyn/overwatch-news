@@ -1,3 +1,5 @@
+# typed: strict
+
 require "excon"
 require "nokogiri"
 require "json"
@@ -5,10 +7,14 @@ require "time"
 require_relative "source"
 
 class Twitter < Source
+	extend T::Sig
+
+	sig {override.returns(String)}
 	def icon
 		"🐦"
 	end
 
+	sig {override.returns(T::Array[T::Hash[String, T.untyped]])}
 	def fetch_items
 		response = Excon.get(
 			"https://api.twitter.com/2/users/2420931980/tweets?exclude=replies,retweets",
